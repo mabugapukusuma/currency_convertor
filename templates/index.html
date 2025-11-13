@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Currency Converter</title>
+
+    <!-- Include jQuery and Select2 for searchable dropdown -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #d4fc79, #96e6a1);
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .converter-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 420px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            color: #222;
+            font-size: 26px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1.5px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin: 10px 0 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1.5px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            background: #3bb78f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #34a36e;
+        }
+
+        .result {
+            margin-top: 25px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .result span {
+            font-weight: bold;
+            color: #1a8754;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 40px;
+            border-radius: 8px;
+            border: 1.5px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-selection__rendered {
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="converter-container">
+        <h2>🌍 Currency Converter</h2>
+
+        <form method="POST" action="/">
+            <label>Enter Amount:</label>
+            <input type="number" name="amount" step="0.01" min="0" required placeholder="e.g. 100">
+
+            <!-- From Currency -->
+            <label for="from">From:</label>
+            <select name="from" id="from" required>
+                {% for c in currencies %}
+                <option value="{{ c.code }}">
+                    {{ c.flag | safe }} {{ c.country if c.country else c.name }} ({{ c.code }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- To Currency -->
+            <label for="to">To:</label>
+            <select name="to" id="to" required>
+                {% for c in currencies %}
+                <option value="{{ c.code }}">
+                    {{ c.flag | safe }} {{ c.country if c.country else c.name }} ({{ c.code }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">💱 Convert</button>
+        </form>
+
+        <!-- ✅ Converted Result + Feedback Section -->
+        {% if converted_amount %}
+        <div class="result">
+            Converted Amount: <br>
+            <span>{{ flag | safe }} {{ symbol }} {{ "%.2f" % converted_amount }}</span>
+        </div>
+
+        <!-- Feedback form -->
+        {% if not feedback_given %}
+        <div class="feedback-box" style="margin-top:20px;">
+            <h3>⭐ Rate your experience</h3>
+            <form method="POST" action="/">
+                <div style="margin-bottom:10px;">
+                    <label><input type="radio" name="rating" value="5" required> ⭐⭐⭐⭐⭐ Excellent</label><br>
+                    <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐ Good</label><br>
+                    <label><input type="radio" name="rating" value="3"> ⭐⭐⭐ Average</label><br>
+                    <label><input type="radio" name="rating" value="2"> ⭐⭐ Poor</label><br>
+                    <label><input type="radio" name="rating" value="1"> ⭐ Very Bad</label>
+                </div>
+
+                <textarea name="comment" placeholder="Any comments (optional)" rows="3"
+                    style="width:100%; border-radius:8px; padding:8px; border:1.5px solid #ccc;"></textarea><br>
+
+                <button type="submit" style="background:#ffb347;">Submit Feedback</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="result" style="background:#e3ffd9;">
+            ✅ Thank you for your feedback!
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        // Make dropdowns searchable using Select2
+        $(document).ready(function() {
+            $('#from').select2({
+                placeholder: "Select a country",
+                width: '100%'
+            });
+            $('#to').select2({
+                placeholder: "Select a country",
+                width: '100%'
+            });
+        });
+    </script>
+
+</body>
+</html>
